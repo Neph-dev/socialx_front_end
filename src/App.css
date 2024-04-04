@@ -1,38 +1,124 @@
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
   background-color: #282c34;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #fff;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.App-link {
-  color: #61dafb;
+.full-width-justify-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.full-width-justify-between {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.connect-btn {
+  background-color: #61dafb;
+  color: #282c34;
+  font-size: 1rem;
+  padding: .5rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.glass-bg {
+  background: #282c34;
+  min-height: 60vh;
+  width: 40vw;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.post-card {
+  background: #282c34;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem;
+  width: 90%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.post-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.font-medium {
+  font-size: 15px;
+}
+
+.font-small {
+  font-size: 13px;
+}
+
+.post-card-content {
+  padding: 1rem;
+  text-align: left;
+}
+
+.post-card-footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.post-card-footer button {
+  color: #282c34;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.post-card-footer div {
+  margin-left: 5px;
+  font-size: 16px;
+}
+
+.width-separator {
+  width: 20px;
+}
+
+.post-card textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: none;
+  background-color: transparent !important;
+  color: #fff;
+  resize: none;
+  height: 80px;
+  font-size: 18px;
+  outline: none !important;
+}
+
+.send-button {
+  background-color: #61dafb;
+  color: #282c34;
+  font-size: 1rem;
+  padding: .5rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 1rem;
+  justify-content: flex-start;
+  text-align: left;
+  display: flex;
+}
+
+.send-button:hover {
+  background-color: #357d91;
+  color: #fff;
 }
