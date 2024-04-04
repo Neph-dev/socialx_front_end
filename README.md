@@ -1,8 +1,8 @@
-# Application Name
+# SocialX
 
 ## Description
 
-This application is a decentralized blog that allows users to create and view posts on the Ethereum blockchain. It uses the ethers.js library to interact with the Ethereum network and the Alchemy API to fetch data from the blockchain.
+SocialX is a decentralized blog that allows users to create and view posts on the Ethereum blockchain. It uses the ethers.js library to interact with the Ethereum network and the Alchemy API to fetch data from the blockchain.
 
 ## Installation
 
