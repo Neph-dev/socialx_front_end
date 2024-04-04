@@ -8,7 +8,7 @@ const ethers = require("ethers")
 const dayjs = require('dayjs')
 
 
-const CONTRACT_ADDRESS = "0x0E2EBc54249d90D35b267C7acf6539B87eFcd854"
+const CONTRACT_ADDRESS = "0xDb1B2670e64c07C0034F1d3d6377838B0408AB20"
 const CONTRACT_ABI = SocialX.abi
 const SEPOLIA_CHAIN_ID = "0xaa36a7"
 
@@ -36,14 +36,13 @@ const findMetamaskWallet = async () => {
 
 const App = () => {
 
-  const _posts = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",]
-
   const [isLikeLoading, setIsLikeLoading] = useState(false)
   const [isHateLoading, setIsHateLoading] = useState(false)
   const [isSubmitLoading, setIsSubmitLoading] = useState(false)
   const [curentAccount, setCurentAccount] = useState(null)
   const [input, setInput] = useState(null)
   const [maxContentLength, setMaxContentLength] = useState(0)
+  const [errorMessage, setErrorMessage] = useState(null)
   const [posts, setPosts] = useState([])
 
   const isDisabled = () => {
@@ -52,28 +51,37 @@ const App = () => {
     }
   }
 
-  // const provider = new ethers.AlchemyProvider(ethereum);
-  // const provider = new ethers.BrowserProvider();
-  // const signer = provider.getSigner();
-
   let signer = null
   let provider
   let contract
+
+  const getEthersParams = async () => {
+    if (window.ethereum == null) {
+      alert("MetaMask not installed; using read-only defaults")
+      provider = ethers.getDefaultProvider()
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    }
+    else {
+      provider = new ethers.BrowserProvider(window.ethereum)
+      signer = await provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    }
+  }
 
   useEffect(() => {
     if (!ethereum) {
       alert('Make sure that metamask is installed.')
       return null
     }
-    // provider = ethers.getDefaultProvider()
     findMetamaskWallet()
       .then(async (account) => {
         if (account) {
           setCurentAccount(account)
-          await getMaxContentLength()
           await fetchAllPosts()
+          await getMaxContentLength()
         }
       })
+
   }, [])
 
   const connectMetamaskWallet = async () => {
@@ -98,24 +106,14 @@ const App = () => {
       window.location.reload(false)
     }
     catch (err) {
-      console.log(err)
+      setErrorMessage(err.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
       return null
     }
     finally {
       setIsSubmitLoading(false)
-    }
-  }
-
-  const getEthersParams = async () => {
-    if (window.ethereum == null) {
-      alert("MetaMask not installed; using read-only defaults")
-      provider = ethers.getDefaultProvider()
-      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-    }
-    else {
-      provider = new ethers.BrowserProvider(window.ethereum)
-      signer = await provider.getSigner();
-      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     }
   }
 
@@ -138,7 +136,10 @@ const App = () => {
       setPosts(allPosts)
     }
     catch (err) {
-      console.log(err.message)
+      setErrorMessage(err.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
     }
   }
 
@@ -151,15 +152,27 @@ const App = () => {
     e.preventDefault()
     setIsSubmitLoading(true)
     try {
-      if (input.length > 0) {
+      if (input?.length > 0) {
         await getEthersParams()
-        await contract.createPost(input)
+        const postCreation = await contract.createPost(input)
+        await postCreation.wait()
 
-        window.location.reload(false)
+        await fetchAllPosts()
+
+        setInput('')
+      }
+      else {
+        setErrorMessage("Content cannot be null")
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 3000)
       }
     }
     catch (err) {
-      console.log(err.message)
+      setErrorMessage(err.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
     }
     finally {
       setIsSubmitLoading(false)
@@ -170,11 +183,16 @@ const App = () => {
     try {
       setIsLikeLoading(true)
       await getEthersParams()
-      await contract.likePost(_author, _postId)
-      window.location.reload(false)
+      const postLike = await contract.likePost(_author, _postId)
+      await postLike.wait()
+
+      await fetchAllPosts()
     }
     catch (err) {
-      console.log(err.message)
+      setErrorMessage(err.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
     }
     finally {
       setIsLikeLoading(false)
@@ -185,11 +203,18 @@ const App = () => {
     try {
       setIsHateLoading(true)
       await getEthersParams()
-      await contract.unlikePost(_author, _postId)
+      const postUnlike = await contract.unlikePost(_author, _postId)
+      await postUnlike.wait()
+
+      await fetchAllPosts()
+
       window.location.reload(false)
     }
     catch (err) {
-      console.log(err.message)
+      setErrorMessage(err.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
     }
     finally {
       setIsHateLoading(false)
@@ -223,6 +248,12 @@ const App = () => {
 
   return (
     <div className="App">
+      {errorMessage !== null &&
+        <div className='main-alert font-medium'>
+          {errorMessage}
+        </div>
+      }
+
       {curentAccount ?
         <div className='font-medium header'>
           {formatAddress(curentAccount)}
@@ -247,6 +278,7 @@ const App = () => {
               className='post-input'
               onChange={onTypeSomething}
               autoFocus={true}
+              value={input}
               autoComplete='off'
               maxLength={maxContentLength}
               autoCorrect='on'
@@ -266,7 +298,7 @@ const App = () => {
                   </button>
                 </div>
                 <div className='font-small'>
-                  {Number(maxContentLength)}/{input?.length ?? 0}
+                  {input?.length ?? 0}/{Number(maxContentLength)}
                 </div>
               </div>
             }
@@ -278,7 +310,6 @@ const App = () => {
                   {formatAddress(post.author)}
                 </div>
                 <div className='font-small'>
-                  {/* 15 minutes ago */}
                   {formatTime(post.timestamp)}
                 </div>
               </div>

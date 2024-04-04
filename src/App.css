@@ -122,3 +122,13 @@
   background-color: #357d91;
   color: #fff;
 }
+
+.main-alert {
+  background-color: #f44336;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+}
